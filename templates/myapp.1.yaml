@@ -1,0 +1,22 @@
+{{- $config := (datasource "config") -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: myapp1
+  namespace: default
+  labels:
+    app: myapp1
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: myapp1
+    spec:
+      containers:
+      - name: operator
+        imagePullPolicy: Always
+        image: nginx
+        env:
+          - name: "MYENVSPECIFICVAR"
+            value: "{{ $config.myenvspecicvar }}"

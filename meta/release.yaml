@@ -1,0 +1,4 @@
+{{- $template := (datasource "template") -}}
+# templated file: {{ (datasource "name") | strings.TrimSpace }}
+---
+{{ $template | data.ToYAML }}
