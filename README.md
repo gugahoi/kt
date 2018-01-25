@@ -17,7 +17,13 @@ services:
 
 You can now run the tool as required with `docker-compose run --rm t <command>` where `<command>` is one of the following:
 
-TBD
+* *validate*: Compiles the templates with a given env (given via the `env` environment variable) and will validate the validity of the compiles manifests againsts the Kubernetes API server.
+* *deploy*: Will compile and deploy the manifests files for an environment (given by the `env` environment variable).
+
+The above are the two main commands, but because `kube-template` uses a dependency build tool you can debug intermin stages of the build such:
+
+* *compile*: Will compile each template file only with the given env - you can then view them in the `_build/compiled` folder.
+* *join*: Will compile and then merge all the template files together into a single file of Kubernetes manifests. This can be viewed at `_build/<env>/joined.yaml`.
 
 ## Conventions
 
@@ -33,3 +39,12 @@ The `kube-template` tool assumes the following conventions of your project:
 * [shake](http://shakebuild.com/) to provide a programmatic dependency build tool specific to our conventions and domain. This is a library in Haskell so gives full programming language power, with strong type safety.
 * [gomplate](https://gomplate.hairyhenderson.ca/) to provide templating of Kubernetes manifests to allow for different environments and complex setup
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) to due the actual deployment of the compiled template manifests.
+
+This is sticking with the principle of not reinventing the wheel and rewriting a specific tool from scratch that would require more effort, testing and maintenance.
+
+### Roadmap
+
+Assuming this tool is useful here are some extra features that could be implemented in the future:
+
+* Manage the lifecycle of objects by using a label for each project to be able to see if any objects need to be deleted as they are present on the API server but no longer present in manifest files.
+* Provide a cli command to work with a specific 'component' or template subfolder rather than have to run the full project.
