@@ -41,10 +41,14 @@ buildRules' flags = do
 
     compilePhony env Nothing
     joinPhony env
+    validatePhony env
+    deployPhony env
 
     compileRule env
     joinRule env Nothing
     injectRule env
+    validateRule env
+    deployRule env
   where
     envFinder (KubeEnvironment _) = True
     envFinder _ = False

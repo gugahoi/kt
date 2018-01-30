@@ -46,6 +46,18 @@ injectRule env = "_build" </> env </> "injected" <//> "*.yaml" %> \out -> do
     need [input]
     cmd_ Shell "echo" [input] "|" "gomplate" "--out" out "--file" metaTemplate ("--datasource template=" ++ input) "--datasource name=stdin:"
 
+deployRule :: Environment -> Rules ()
+deployRule env = "_build" </> env </> "deployed.txt" %> \out -> do
+    let joined = "_build" </> env </> "joined.yaml"
+    need [joined]
+    cmd_ Shell "kubectl" "apply" "-f" joined "|" "tee" out
+
+validateRule :: Environment -> Rules ()
+validateRule env = "_build" </> env </> "validated.txt" %> \out -> do
+    let joined = "_build" </> env </> "joined.yaml"
+    need [joined]
+    cmd_ Shell "kubectl" "apply" "--validate" "--dry-run" "-f" joined "|" "tee" out
+
 -- PHONIES
 compilePhony :: Environment -> Component -> Rules ()
 compilePhony env comp = phony "compile" $ do
@@ -56,3 +68,11 @@ compilePhony env comp = phony "compile" $ do
 joinPhony :: Environment -> Rules ()
 joinPhony env = phony "join" $ do
     need ["_build" </> env </> "joined.yaml"]
+
+validatePhony :: Environment -> Rules ()
+validatePhony env = phony "validate" $ do
+    need ["_build" </> env </> "validated.txt"]
+
+deployPhony :: Environment -> Rules ()
+deployPhony env = phony "deploy" $ do
+    need ["_build" </> env </> "deployed.txt"]
