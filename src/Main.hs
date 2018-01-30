@@ -1,0 +1,48 @@
+module Main where
+
+import Development.Shake
+import Development.Shake.Command
+import Development.Shake.FilePath
+import Development.Shake.Util
+
+import System.Console.GetOpt
+
+import Data.Maybe
+
+import Rules
+
+data KubeCmdFlags = KubeEnvironment String
+                  | KubeComponent String
+                  deriving (Show, Eq)
+
+flags :: [OptDescr (Either String KubeCmdFlags)]
+flags =
+  [ Option "e" ["kt-environment"] (ReqArg (\s -> Right $ KubeEnvironment s) "ENVIRONMENT") "The Kubernetes environment to deploy to (name of file in 'env' folder sans .yaml)."
+  , Option "c" ["kt-component"] (ReqArg (\s -> Right $ KubeComponent s) "COMPONENT") "The component (a subfolder under your templates dir) you want to deploy."
+  ]
+
+buildRules :: [KubeCmdFlags] -> [String] -> IO (Maybe (Rules ()))
+buildRules flags targets = return $ Just $ do
+    if null targets then want [] else want targets
+
+    phony "clean" $ do
+      putNormal "Cleaning files in _build..."
+      removeFilesAfter "_build" ["//*"]
+
+    buildRules' flags
+
+buildRules' :: [KubeCmdFlags] -> Rules ()
+buildRules' [] = return ()
+buildRules' flags = do
+    let env = "qa"
+
+    compilePhony env Nothing
+    joinPhony env
+
+    compileRule env
+    joinRule env Nothing
+    injectRule env
+
+
+main :: IO ()
+main = shakeArgsWith shakeOptions{shakeThreads=4, shakeFiles="_build"} flags $ buildRules

@@ -1,24 +1,22 @@
 version: "2.3"
 
 x-base: &base
-  build: .
+  build:
+    context: .
+    target: build
   volumes:
     - ".:/app"
     - "$HOME/.kube:/root/.kube"
+    - "./meta:/opt/meta"
   working_dir: /app
-  
 
 services:
-  shake:
+  cabal:
     <<: *base
-    entrypoint: 
-      - runhaskell
-      - Build.hs
+    entrypoint:
+      - cabal
 
   sh:
     <<: *base
-    entrypoint: [sh]
-    
-  kubectl:
-    <<: *base
-    entrypoint: [kubectl]
+    entrypoint:
+      - sh
