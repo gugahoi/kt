@@ -8,6 +8,7 @@ import Development.Shake.Util
 import System.Console.GetOpt
 
 import Data.Maybe
+import Data.List (find)
 
 import Rules
 
@@ -34,7 +35,9 @@ buildRules flags targets = return $ Just $ do
 buildRules' :: [KubeCmdFlags] -> Rules ()
 buildRules' [] = return ()
 buildRules' flags = do
-    let env = "qa"
+    let env = case find envFinder flags of
+                Just (KubeEnvironment env) -> env
+                Nothing -> "dev"
 
     compilePhony env Nothing
     joinPhony env
@@ -42,7 +45,9 @@ buildRules' flags = do
     compileRule env
     joinRule env Nothing
     injectRule env
-
+  where
+    envFinder (KubeEnvironment _) = True
+    envFinder _ = False
 
 main :: IO ()
 main = shakeArgsWith shakeOptions{shakeThreads=4, shakeFiles="_build"} flags $ buildRules
