@@ -1,0 +1,12 @@
+#! /bin/bash
+
+set -e
+
+IMAGE=myobplatform/kt
+VERSION=${1:-dev}
+
+docker build -t $IMAGE:$VERSION .
+
+if [[ "$VERSION" != "dev" ]]; then
+  docker push $IMAGE:$VERSION
+fi
