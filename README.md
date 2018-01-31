@@ -2,6 +2,12 @@
 
 This repo provides a docker image as a tool to use `gomplate` with `kubectl` to deploy Kubernetes apps across different environments.
 
+It uses a dependency build like system such that:
+
+* caching of stages can occur if files are not changed between runs
+* stages can be debugged as each stage outputs temporary files that are dependent on later stages
+* `kt` can lean on the underlying build system to provide parallelism for extra speed with little to no effort
+
 ## Usage
 
 To use this tool, add it to your `docker-compose.yml` file as the following service:
