@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: myapp
+      annotations:
+        config/checksum: "{{ printf "%.35s" (base64.Encode (include "namespaces.pre.yaml")) }}"
     spec:
       containers:
       - name: operator

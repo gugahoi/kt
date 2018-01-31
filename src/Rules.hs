@@ -5,6 +5,8 @@ import Development.Shake.Command
 import Development.Shake.FilePath
 import Development.Shake.Util
 
+import Data.List
+
 type Environment = String
 type Component = Maybe String
 
@@ -24,13 +26,17 @@ templateComponentPath = maybe templateFolder ((</>) templateFolder)
 buildPathWithComponentTemplate :: FilePath -> FilePath
 buildPathWithComponentTemplate = dropDirectory1 . dropDirectory1 . dropDirectory1
 
+templateFilesToDatasourceFlags :: FilePath -> [FilePath] -> [String]
+templateFilesToDatasourceFlags currentTemplate files = ["--datasource " ++ f ++ "=" ++ templateFolder </> f | f <- files, f /= currentTemplate]
+
 -- RULES
 compileRule :: Environment -> Rules ()
 compileRule env = "_build" </> env </> "compiled" <//> "*.yaml" %> \out -> do
     let input = templateFolder </> (takeFileName out)
     let fullEnv = envFolder </> env <.> "yaml"
+    allTemplateFiles <- getDirectoryFiles templateFolder ["//*"]
     need [input, fullEnv]
-    cmd_ "gomplate" "--out" out "--file" input ("--datasource config=" ++ fullEnv)
+    cmd_ "gomplate" "--out" out "--file" input ("--datasource config=" ++ fullEnv) $ intercalate " " $ templateFilesToDatasourceFlags input allTemplateFiles
 
 joinRule :: Environment -> Component -> Rules ()
 joinRule env comp = "_build" </> env </> "joined.yaml" %> \out -> do
