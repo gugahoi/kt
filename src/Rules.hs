@@ -50,7 +50,7 @@ injectRule :: Environment -> Rules ()
 injectRule env = "_build" </> env </> "injected" <//> "*.yaml" %> \out -> do
     let input = "_build" </> env </> "compiled" </> (buildPathWithComponentTemplate out)
     need [input]
-    cmd_ Shell "echo" [input] "|" "gomplate" "--out" out "--file" metaTemplate ("--datasource template=" ++ input) "--datasource name=stdin:"
+    cmd_ "gomplate" "--out" out "--file" metaTemplate ("--datasource template=" ++ input)
 
 deployRule :: Environment -> Rules ()
 deployRule env = "_build" </> env </> "deployed.txt" %> \out -> do
