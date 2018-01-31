@@ -31,9 +31,16 @@ The above are the two main commands, but because `kt` uses a dependency build to
 * *compile*: Will compile each template file with the given env - you can then view them in the `_build/<env>/compiled/templates` folder.
 * *join*: Will compile and then merge all the template files together into a single file of Kubernetes manifests. This can be viewed at `_build/<env>/joined.yaml`.
 
-`kt` uses the Haskell library [Shake](http://shakebuild.com/) so you can use any of the available command line flags to increase/decrease logging or debug issues or timings and do dry runs. To see all available options, run `docker-compose run --rm kt -h`.
+### Command line flags
+
+`kt` uses the Haskell library [Shake](http://shakebuild.com/) so you can use any of the available command line flags to increase/decrease logging, debug issues, determine timings and do dry runs. To see all available options, run `docker-compose run --rm kt -h`.
 
 By default `kt` uses 4 threads to parallalize as much of the work as possible, to change the amount of threads use the `-j` flag, eg to use a single thread to make debugging easier set `-j1`.
+
+In addition to all the Shake flags, the following two flags can be used that are specific to `kt`:
+
+* -e ENVIRONMENT, --kt-environment=ENVIRONMENT  The Kubernetes environment to deploy to (name of file in 'env' folder sans .yaml).
+* -c COMPONENT, --kt-component=COMPONENT  The component (a subfolder under your templates dir) you want to deploy.
 
 ## Conventions
 

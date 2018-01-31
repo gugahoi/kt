@@ -38,20 +38,26 @@ buildRules' flags = do
     let env = case find envFinder flags of
                 Just (KubeEnvironment env) -> env
                 Nothing -> "dev"
+    let comp = case find compFinder flags of
+                 Just (KubeComponent comp) -> Just comp
+                 Nothing -> Nothing
 
-    compilePhony env Nothing
+    compilePhony env comp
     joinPhony env
     validatePhony env
     deployPhony env
 
     compileRule env
-    joinRule env Nothing
+    joinRule env comp
     injectRule env
     validateRule env
     deployRule env
   where
     envFinder (KubeEnvironment _) = True
     envFinder _ = False
+
+    compFinder (KubeComponent _) = True
+    compFinder _ = False
 
 main :: IO ()
 main = shakeArgsWith shakeOptions{shakeThreads=4, shakeFiles="_build"} flags $ buildRules

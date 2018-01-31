@@ -29,10 +29,13 @@ buildPathWithComponentTemplate = dropDirectory1 . dropDirectory1 . dropDirectory
 templateFilesToDatasourceFlags :: FilePath -> [FilePath] -> [String]
 templateFilesToDatasourceFlags currentTemplate files = ["--datasource " ++ f ++ "=" ++ templateFolder </> f | f <- files, f /= currentTemplate]
 
+stripFrontDirs :: Int -> FilePath -> FilePath
+stripFrontDirs dirLevel = joinPath . drop dirLevel . splitPath
+
 -- RULES
 compileRule :: Environment -> Rules ()
 compileRule env = "_build" </> env </> "compiled" <//> "*.yaml" %> \out -> do
-    let input = templateFolder </> (takeFileName out)
+    let input = templateFolder </> (stripFrontDirs 4 out)
     let fullEnv = envFolder </> env <.> "yaml"
     allTemplateFiles <- getDirectoryFiles templateFolder ["//*"]
     need [input, fullEnv]
