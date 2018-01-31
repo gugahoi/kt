@@ -11,10 +11,16 @@ x-base: &base
   working_dir: /app
 
 services:
-  cabal:
+  build:
     <<: *base
     entrypoint:
       - cabal
+      - build
+
+  kt:
+    <<: *base
+    entrypoint: |
+      cabal run kt -- -C example
 
   sh:
     <<: *base
