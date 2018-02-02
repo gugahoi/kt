@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MYOB-Technology/kt.svg?branch=master)](https://travis-ci.org/MYOB-Technology/kt)
+
 # kt
 
 This repo provides a docker image as a tool to use `gomplate` with `kubectl` to deploy Kubernetes apps across different environments.

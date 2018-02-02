@@ -11,3 +11,6 @@ before_install:
 
 script:
   - docker-compose run --rm build
+
+after_success:
+  - bin/deploy "${TRAVIS_TAG:-dev}"
