@@ -58,6 +58,10 @@ On top of the gomplate functions, `kt` adds in the following additional power th
 * Reference `datasource "config"` in a template to pull out the values that you specify in your `envs` files, eg `{{ $config := (datasource "config") }}` will give you a variable that you can access for env values using dot notation such as `{{ $config.envValue }}` where `envValue` is the YAML key in each of your `envs` files.
 * You are able to access all other template contents from a template using `gomplate`'s `include` function. just specify the relative path from the `templates` folder as the datasource key, eg `{{ include "mycomponent/config-map.yaml" }}` to access the contents of the `templates/mycomponent/config-map.yaml` file. _NOTE: To avoid circular dependencies and other issues, note that including any other template will be done without any template compilation - it is the raw file from disk._
 
+### Ordering
+
+The template files are joined in alphabetical order. This means that one can control the order in which objects are applied to the Kubernetes API server by simply prefixing files with numbers to force the ordering.
+
 ## Development
 
 `kt` is simply a combination of the following tools with folder conventions:

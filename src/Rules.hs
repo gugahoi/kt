@@ -45,7 +45,7 @@ joinRule :: Environment -> Component -> Rules ()
 joinRule env comp = "_build" </> env </> "joined.yaml" %> \out -> do
     let fullTemplatePath = templateComponentPath comp
     files <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
-    let compiledFiles = ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- files]
+    let compiledFiles = sort ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- files]
     need compiledFiles
     cmd_ Shell "cat" compiledFiles ">" out
 
