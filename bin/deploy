@@ -5,6 +5,10 @@ set -e
 IMAGE=myobplatform/kt
 VERSION=${1:-dev}
 
+if [[ -n "$DOCKERHUB_USERNAME" && -n "$DOCKERHUB_PASSWORD" ]]; then
+  docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+fi
+
 docker build -t $IMAGE:$VERSION .
 
 if [[ "$VERSION" != "dev" ]]; then
