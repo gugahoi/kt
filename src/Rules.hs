@@ -61,6 +61,12 @@ deployRule env = "_build" </> env </> "deployed.txt" %> \out -> do
     need [joined]
     cmd_ Shell "kubectl" "apply" "-f" joined "|" "tee" out
 
+deleteRule :: Environment -> Rules ()
+deleteRule env = "_build" </> env </> "deleted.txt" %> \out -> do
+    let joined = "_build" </> env </> "joined.yaml"
+    need [joined]
+    cmd_ Shell "kubectl" "delete" "-f" joined "|" "tee" out
+
 validateRule :: Environment -> Rules ()
 validateRule env = "_build" </> env </> "validated.txt" %> \out -> do
     let joined = "_build" </> env </> "joined.yaml"
@@ -85,3 +91,7 @@ validatePhony env = phony "validate" $ do
 deployPhony :: Environment -> Rules ()
 deployPhony env = phony "deploy" $ do
     need ["_build" </> env </> "deployed.txt"]
+
+deletePhony :: Environment -> Rules ()
+deletePhony env = phony "delete" $ do
+    need ["_build" </> env </> "deleted.txt"]

@@ -27,6 +27,7 @@ You can now run the tool as required with `docker-compose run --rm kt <command>`
 
 * *validate*: Compiles the templates with a given env (given via the `-e ENV` flag) and will validate the validity of the compiles manifests againsts the Kubernetes API server.
 * *deploy*: Will compile and deploy the manifests files for an environment (given via the `-e ENV` flag).
+* *delete*: **CAUTION**, will compile and join the manifests and then delete all the Objects on the API server that are named in the compiled manifests.
 
 The above are the two main commands, but because `kt` uses a dependency build tool you can debug intermin stages of the build such:
 
