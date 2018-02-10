@@ -7,8 +7,22 @@ import Development.Shake.Util
 
 import Data.List
 
-type Environment = String
-type Component = Maybe String
+import Configuration
+
+
+buildRules' :: [KubeCmdFlags] -> Rules ()
+buildRules' [] = return ()
+buildRules' flags = do
+    let config = parseFlags flags
+
+    buildFolder <//> "compiled" <//> "*.yaml" %> \out -> do
+        let envFile = envFileFor config
+        let input = templateFolderFor config </> stripFrontDirs 3 out
+        templateFiles <- getDirectoryFiles $ templateFolderFor config
+        need [input, envFile]
+
+    return ()
+
 
 -- PATH MANIPULATIONS
 metaTemplate :: FilePath
@@ -33,6 +47,11 @@ stripFrontDirs :: Int -> FilePath -> FilePath
 stripFrontDirs dirLevel = joinPath . drop dirLevel . splitPath
 
 -- RULES
+
+class ExecutableRule a where
+    getNeeds :: a -> FilePath -> [FilePath]
+
+
 compileRule :: Environment -> Rules ()
 compileRule env = "_build" </> env </> "compiled" <//> "*.yaml" %> \out -> do
     let input = templateFolder </> (stripFrontDirs 4 out)

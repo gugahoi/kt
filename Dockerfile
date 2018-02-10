@@ -8,7 +8,7 @@ COPY --from=gomplate /gomplate /usr/bin/
 COPY --from=kubectl /usr/local/bin/kubectl /usr/bin/
 WORKDIR /app
 COPY ./kt.cabal /app/
-RUN cabal install --only-dependencies -j4
+RUN cabal install --only-dependencies -j4 --enable-tests
 COPY . /app/
 RUN cabal build --ghc-options '-static -optl-static -optl-pthread'
 
