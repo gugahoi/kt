@@ -1,4 +1,1 @@
-{{- $template := (datasource "template") -}}
-
----
-{{ $template | data.ToYAML }}
+{{ include "template" }}

@@ -34,6 +34,7 @@ buildRules' flags = do
                  Nothing -> Nothing
 
     compilePhony env comp
+    injectPhony env comp
     joinPhony env
     validatePhony env
     deployPhony env

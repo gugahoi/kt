@@ -80,6 +80,12 @@ compilePhony env comp = phony "compile" $ do
     templateFiles <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
     need ["_build" </> env </> "compiled" </> fullTemplatePath </> f | f <- templateFiles]
 
+injectPhony :: Environment -> Component -> Rules ()
+injectPhony env comp = phony "inject" $ do
+    let fullTemplatePath = templateComponentPath comp
+    templateFiles <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
+    need ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- templateFiles]
+
 joinPhony :: Environment -> Rules ()
 joinPhony env = phony "join" $ do
     need ["_build" </> env </> "joined.yaml"]
