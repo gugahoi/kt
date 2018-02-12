@@ -10,17 +10,8 @@ import System.Console.GetOpt
 import Data.Maybe
 import Data.List (find)
 
+import Configuration
 import Rules
-
-data KubeCmdFlags = KubeEnvironment String
-                  | KubeComponent String
-                  deriving (Show, Eq)
-
-flags :: [OptDescr (Either String KubeCmdFlags)]
-flags =
-  [ Option "e" ["kt-environment"] (ReqArg (\s -> Right $ KubeEnvironment s) "ENVIRONMENT") "The Kubernetes environment to deploy to (name of file in 'env' folder sans .yaml)."
-  , Option "c" ["kt-component"] (ReqArg (\s -> Right $ KubeComponent s) "COMPONENT") "The component (a subfolder under your templates dir) you want to deploy."
-  ]
 
 buildRules :: [KubeCmdFlags] -> [String] -> IO (Maybe (Rules ()))
 buildRules flags targets = return $ Just $ do
@@ -62,4 +53,4 @@ buildRules' flags = do
     compFinder _ = False
 
 main :: IO ()
-main = shakeArgsWith shakeOptions{shakeThreads=4, shakeFiles="_build"} flags $ buildRules
+main = shakeArgsWith shakeOptions{shakeThreads=4, shakeFiles="_build"} cliFlags $ buildRules

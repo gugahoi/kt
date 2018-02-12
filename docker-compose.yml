@@ -17,6 +17,12 @@ services:
       - cabal
       - build
 
+  test:
+    <<: *base
+    entrypoint:
+      - cabal
+      - test
+
   repl:
     <<: *base
     entrypoint:
