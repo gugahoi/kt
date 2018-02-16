@@ -1,14 +1,16 @@
-FROM hairyhenderson/gomplate:v2.2.0 as gomplate
+FROM hairyhenderson/gomplate:v2.3.0 as gomplate
 
 FROM lachlanevenson/k8s-kubectl:v1.7.12 as kubectl
 
-FROM haskell:7 as build
+FROM haskell:8.2.1 as build
 RUN cabal update
 COPY --from=gomplate /gomplate /usr/bin/
 COPY --from=kubectl /usr/local/bin/kubectl /usr/bin/
 WORKDIR /app
 COPY ./kt.cabal /app/
+
 RUN cabal install --only-dependencies -j4 --enable-tests
+
 COPY . /app/
 RUN cabal build --ghc-options '-static -optl-static -optl-pthread'
 
