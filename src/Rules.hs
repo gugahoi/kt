@@ -59,19 +59,23 @@ deployRule :: Environment -> Rules ()
 deployRule env = "_build" </> env </> "deployed.txt" %> \out -> do
     let joined = "_build" </> env </> "joined.yaml"
     need [joined]
-    cmd_ Shell "kubectl" "apply" "-f" joined "|" "tee" out
+    Stdout s <- cmd [FileStdout out] "kubectl" "apply" "-f" joined
+    putNormal s
 
 deleteRule :: Environment -> Rules ()
 deleteRule env = "_build" </> env </> "deleted.txt" %> \out -> do
     let joined = "_build" </> env </> "joined.yaml"
     need [joined]
-    cmd_ Shell "kubectl" "delete" "-f" joined "|" "tee" out
+    Stdout s <- cmd [FileStdout out] "kubectl" "delete" "-f" joined
+    putNormal s
 
 validateRule :: Environment -> Rules ()
 validateRule env = "_build" </> env </> "validated.txt" %> \out -> do
     let joined = "_build" </> env </> "joined.yaml"
     need [joined]
-    cmd_ Shell "kubectl" "apply" "--validate" "--dry-run" "-f" joined "|" "tee" out
+    Stdout s <- cmd [FileStdout out] "kubectl" "apply" "--validate" "--dry-run" "-f" joined
+    putNormal s
+
 
 -- PHONIES
 compilePhony :: Environment -> Component -> Rules ()
