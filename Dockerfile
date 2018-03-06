@@ -1,4 +1,4 @@
-FROM hairyhenderson/gomplate:v2.3.0 as gomplate
+FROM hairyhenderson/gomplate:v2.4.0 as gomplate
 
 FROM lachlanevenson/k8s-kubectl:v1.7.12 as kubectl
 

@@ -14,7 +14,7 @@ spec:
       labels:
         app: mycomponentapp
       annotations:
-        config/checksum: "{{ printf "%.35s" (base64.Encode (include "00-namespaces.yaml")) }}"
+        config/checksum: "{{ crypto.SHA256 (file.Read "templates/00-namespaces.yaml") }}"
     spec:
       containers:
       - name: operator
