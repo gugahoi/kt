@@ -21,37 +21,7 @@ buildRules flags targets = return $ Just $ do
       putNormal "Cleaning files in _build..."
       removeFilesAfter "_build" ["//*"]
 
-    buildRules' flags
-
-buildRules' :: [KubeCmdFlags] -> Rules ()
-buildRules' [] = return ()
-buildRules' flags = do
-    let env = case find envFinder flags of
-                Just (KubeEnvironment env) -> env
-                Nothing -> "dev"
-    let comp = case find compFinder flags of
-                 Just (KubeComponent comp) -> Just comp
-                 Nothing -> Nothing
-
-    compilePhony env comp
-    injectPhony env comp
-    joinPhony env
-    validatePhony env
-    deployPhony env
-    deletePhony env
-
-    compileRule env
-    joinRule env comp
-    injectRule env
-    validateRule env
-    deployRule env
-    deleteRule env
-  where
-    envFinder (KubeEnvironment _) = True
-    envFinder _ = False
-
-    compFinder (KubeComponent _) = True
-    compFinder _ = False
+    buildRules' $ parseFlags flags
 
 main :: IO ()
 main = shakeArgsWith shakeOptions{shakeThreads=4, shakeFiles="_build"} cliFlags $ buildRules

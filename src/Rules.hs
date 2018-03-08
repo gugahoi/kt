@@ -7,6 +7,8 @@ import Development.Shake.Util
 
 import Data.List
 
+import Configuration (KtConfiguration, ktConfigurationComponent, ktConfigurationEnvironment)
+
 type Environment = String
 type Component = Maybe String
 
@@ -101,3 +103,22 @@ deployPhony env = phony "deploy" $ do
 deletePhony :: Environment -> Rules ()
 deletePhony env = phony "delete" $ do
     need ["_build" </> env </> "deleted.txt"]
+
+buildRules' :: KtConfiguration -> Rules ()
+buildRules' conf = do
+    let env = ktConfigurationEnvironment conf
+    let comp = ktConfigurationComponent conf
+
+    compilePhony env comp
+    injectPhony env comp
+    joinPhony env
+    validatePhony env
+    deployPhony env
+    deletePhony env
+
+    compileRule env
+    joinRule env comp
+    injectRule env
+    validateRule env
+    deployRule env
+    deleteRule env
