@@ -8,6 +8,7 @@ services:
 
 script:
   - docker-compose run --rm test
+  - docker-compose run --rm kt clean
   - docker-compose run --rm kt join -e qa
 
 after_success:
