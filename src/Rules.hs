@@ -74,47 +74,33 @@ validateRule env = "_build" </> env </> "validated.txt" %> \out -> do
     Stdout s <- cmd [FileStdout out] "kubectl" "apply" "--validate" "--dry-run" "-f" joined
     putNormal s
 
-
--- PHONIES
-compilePhony :: Environment -> Component -> Rules ()
-compilePhony env comp = phony "compile" $ do
-    let fullTemplatePath = templateComponentPath comp
-    templateFiles <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
-    need ["_build" </> env </> "compiled" </> fullTemplatePath </> f | f <- templateFiles]
-
-injectPhony :: Environment -> Component -> Rules ()
-injectPhony env comp = phony "inject" $ do
-    let fullTemplatePath = templateComponentPath comp
-    templateFiles <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
-    need ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- templateFiles]
-
-joinPhony :: Environment -> Rules ()
-joinPhony env = phony "join" $ do
-    need ["_build" </> env </> "joined.yaml"]
-
-validatePhony :: Environment -> Rules ()
-validatePhony env = phony "validate" $ do
-    need ["_build" </> env </> "validated.txt"]
-
-deployPhony :: Environment -> Rules ()
-deployPhony env = phony "deploy" $ do
-    need ["_build" </> env </> "deployed.txt"]
-
-deletePhony :: Environment -> Rules ()
-deletePhony env = phony "delete" $ do
-    need ["_build" </> env </> "deleted.txt"]
-
 buildRules' :: KtConfiguration -> Rules ()
 buildRules' conf = do
     let env = ktConfigurationEnvironment conf
     let comp = ktConfigurationComponent conf
 
-    compilePhony env comp
-    injectPhony env comp
-    joinPhony env
-    validatePhony env
-    deployPhony env
-    deletePhony env
+    -- PHONIES
+    phony "compile" $ do
+        let fullTemplatePath = templateComponentPath comp
+        templateFiles <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
+        need ["_build" </> env </> "compiled" </> fullTemplatePath </> f | f <- templateFiles]
+
+    phony "inject" $ do
+        let fullTemplatePath = templateComponentPath comp
+        templateFiles <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
+        need ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- templateFiles]
+
+    phony "join" $ do
+        need ["_build" </> env </> "joined.yaml"]
+
+    phony "validate" $ do
+        need ["_build" </> env </> "validated.txt"]
+
+    phony "deploy" $ do
+        need ["_build" </> env </> "deployed.txt"]
+
+    phony "delete" $ do
+        need ["_build" </> env </> "deleted.txt"]
 
     compileRule env
     joinRule env comp
