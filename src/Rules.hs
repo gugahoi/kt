@@ -31,49 +31,6 @@ buildPathWithComponentTemplate = dropDirectory1 . dropDirectory1 . dropDirectory
 stripFrontDirs :: Int -> FilePath -> FilePath
 stripFrontDirs dirLevel = joinPath . drop dirLevel . splitPath
 
--- RULES
-compileRule :: Environment -> Rules ()
-compileRule env = "_build" </> env </> "compiled" <//> "*.yaml" %> \out -> do
-    let input = templateFolder </> (stripFrontDirs 4 out)
-    let fullEnv = envFolder </> env <.> "yaml"
-    need [input, fullEnv]
-    cmd_ "gomplate" "--out" out "--file" input ("--datasource config=" ++ fullEnv)
-
-joinRule :: Environment -> Component -> Rules ()
-joinRule env comp = "_build" </> env </> "joined.yaml" %> \out -> do
-    let fullTemplatePath = templateComponentPath comp
-    files <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
-    let compiledFiles = sort ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- files]
-    need compiledFiles
-    cmd_ Shell "cat" compiledFiles ">" out
-
-injectRule :: Environment -> Rules ()
-injectRule env = "_build" </> env </> "injected" <//> "*.yaml" %> \out -> do
-    let input = "_build" </> env </> "compiled" </> (buildPathWithComponentTemplate out)
-    need [input]
-    cmd_ "gomplate" "--out" out "--file" metaTemplate ("--datasource template=" ++ input)
-
-deployRule :: Environment -> Rules ()
-deployRule env = "_build" </> env </> "deployed.txt" %> \out -> do
-    let joined = "_build" </> env </> "joined.yaml"
-    need [joined]
-    Stdout s <- cmd [FileStdout out] "kubectl" "apply" "-f" joined
-    putNormal s
-
-deleteRule :: Environment -> Rules ()
-deleteRule env = "_build" </> env </> "deleted.txt" %> \out -> do
-    let joined = "_build" </> env </> "joined.yaml"
-    need [joined]
-    Stdout s <- cmd [FileStdout out] "kubectl" "delete" "-f" joined
-    putNormal s
-
-validateRule :: Environment -> Rules ()
-validateRule env = "_build" </> env </> "validated.txt" %> \out -> do
-    let joined = "_build" </> env </> "joined.yaml"
-    need [joined]
-    Stdout s <- cmd [FileStdout out] "kubectl" "apply" "--validate" "--dry-run" "-f" joined
-    putNormal s
-
 buildRules' :: KtConfiguration -> Rules ()
 buildRules' conf = do
     let env = ktConfigurationEnvironment conf
@@ -102,9 +59,39 @@ buildRules' conf = do
     phony "delete" $ do
         need ["_build" </> env </> "deleted.txt"]
 
-    compileRule env
-    joinRule env comp
-    injectRule env
-    validateRule env
-    deployRule env
-    deleteRule env
+    -- RULES
+    "_build" </> env </> "compiled" <//> "*.yaml" %> \out -> do
+        let input = templateFolder </> (stripFrontDirs 4 out)
+        let fullEnv = envFolder </> env <.> "yaml"
+        need [input, fullEnv]
+        cmd_ "gomplate" "--out" out "--file" input ("--datasource config=" ++ fullEnv)
+
+    "_build" </> env </> "joined.yaml" %> \out -> do
+        let fullTemplatePath = templateComponentPath comp
+        files <- getDirectoryFiles fullTemplatePath ["//*.yaml"]
+        let compiledFiles = sort ["_build" </> env </> "injected" </> fullTemplatePath </> f | f <- files]
+        need compiledFiles
+        cmd_ Shell "cat" compiledFiles ">" out
+
+    "_build" </> env </> "injected" <//> "*.yaml" %> \out -> do
+        let input = "_build" </> env </> "compiled" </> (buildPathWithComponentTemplate out)
+        need [input]
+        cmd_ "gomplate" "--out" out "--file" metaTemplate ("--datasource template=" ++ input)
+
+    "_build" </> env </> "deployed.txt" %> \out -> do
+        let joined = "_build" </> env </> "joined.yaml"
+        need [joined]
+        Stdout s <- cmd [FileStdout out] "kubectl" "apply" "-f" joined
+        putNormal s
+
+    "_build" </> env </> "deleted.txt" %> \out -> do
+        let joined = "_build" </> env </> "joined.yaml"
+        need [joined]
+        Stdout s <- cmd [FileStdout out] "kubectl" "delete" "-f" joined
+        putNormal s
+
+    "_build" </> env </> "validated.txt" %> \out -> do
+        let joined = "_build" </> env </> "joined.yaml"
+        need [joined]
+        Stdout s <- cmd [FileStdout out] "kubectl" "apply" "--validate" "--dry-run" "-f" joined
+        putNormal s
