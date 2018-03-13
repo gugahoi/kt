@@ -8,28 +8,19 @@ import Development.Shake.Util
 import Data.List
 
 import Configuration (KtConfiguration, ktConfigurationComponent, ktConfigurationEnvironment)
+import File
 
-type Environment = String
 type Component = Maybe String
 
 -- PATH MANIPULATIONS
 metaTemplate :: FilePath
 metaTemplate = "/opt" </> "meta" </> "release.yaml"
 
-envFolder :: FilePath
-envFolder = "envs"
-
-templateFolder :: FilePath
-templateFolder = "templates"
-
 templateComponentPath :: Component -> FilePath
 templateComponentPath = maybe templateFolder ((</>) templateFolder)
 
 buildPathWithComponentTemplate :: FilePath -> FilePath
 buildPathWithComponentTemplate = dropDirectory1 . dropDirectory1 . dropDirectory1
-
-stripFrontDirs :: Int -> FilePath -> FilePath
-stripFrontDirs dirLevel = joinPath . drop dirLevel . splitPath
 
 buildRules' :: KtConfiguration -> Rules ()
 buildRules' conf = do
