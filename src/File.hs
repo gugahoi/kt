@@ -5,6 +5,11 @@ import Development.Shake
 
 import Configuration
 
+type Component = Maybe String
+
+metaTemplate :: FilePath
+metaTemplate = "/opt" </> "meta" </> "release.yaml"
+
 buildFolder :: FilePath
 buildFolder = "_build"
 
@@ -14,8 +19,11 @@ templateFolder = "templates"
 envFolder :: FilePath
 envFolder = "envs"
 
+templateComponentPath :: Component -> FilePath
+templateComponentPath = maybe templateFolder ((</>) templateFolder)
+
 buildFolderFor :: KtConfiguration -> FilePath
-buildFolderFor (KtConfiguration env Nothing) = buildFolder </> env </> "all"
+buildFolderFor (KtConfiguration env Nothing) = buildFolder </> env </> "_all"
 buildFolderFor (KtConfiguration env (Just comp)) = buildFolder </> env </> comp
 
 templateFolderFor :: KtConfiguration -> FilePath
