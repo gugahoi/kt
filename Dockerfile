@@ -1,6 +1,6 @@
 FROM hairyhenderson/gomplate:v2.4.0 as gomplate
 
-FROM lachlanevenson/k8s-kubectl:v1.7.12 as kubectl
+FROM lachlanevenson/k8s-kubectl:v1.9.5 as kubectl
 
 FROM haskell:8.2.1 as build
 RUN cabal update
