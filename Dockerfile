@@ -2,22 +2,10 @@ FROM hairyhenderson/gomplate:v2.4.0 as gomplate
 
 FROM lachlanevenson/k8s-kubectl:v1.9.5 as kubectl
 
-FROM haskell:8.2.1 as build
-RUN cabal update
+FROM alpine:3.6 as app
+RUN apk add -U bash
 COPY --from=gomplate /gomplate /usr/bin/
 COPY --from=kubectl /usr/local/bin/kubectl /usr/bin/
-WORKDIR /app
-COPY ./kt.cabal /app/
-
-RUN cabal install --only-dependencies -j4 --enable-tests
-
-COPY . /app/
-RUN cabal build --ghc-options '-static -optl-static -optl-pthread'
-
-FROM alpine:3.6
-COPY --from=gomplate /gomplate /usr/bin/
-COPY --from=kubectl /usr/local/bin/kubectl /usr/bin/
-COPY meta /opt/meta
-COPY --from=build /app/dist/build/kt/kt /usr/bin/
+COPY ./kt /usr/bin/
 WORKDIR /app
 ENTRYPOINT ["/usr/bin/kt"]

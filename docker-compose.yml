@@ -3,38 +3,20 @@ version: "2.3"
 x-base: &base
   build:
     context: .
-    target: build
+    target: app
   volumes:
-    - ".:/app"
+    - "./example:/app"
+    - ".:/kt"
     - "$HOME/.kube:/root/.kube"
-    - "./meta:/opt/meta"
   working_dir: /app
 
 services:
-  build:
-    <<: *base
-    entrypoint:
-      - cabal
-      - build
-
-  test:
-    <<: *base
-    entrypoint:
-      - cabal
-      - test
-
-  repl:
-    <<: *base
-    entrypoint:
-      - cabal
-      - repl
-
   kt:
     <<: *base
-    entrypoint: |
-      cabal run kt -- -C example
+    entrypoint:
+      - /kt/kt
 
   sh:
     <<: *base
     entrypoint:
-      - sh
+      - bash

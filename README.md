@@ -2,13 +2,7 @@
 
 # kt
 
-This repo provides a docker image as a tool to use `gomplate` with `kubectl` to deploy Kubernetes apps across different environments.
-
-It uses a dependency build like system such that:
-
-* caching of stages can occur if files are not changed between runs
-* stages can be debugged as each stage outputs temporary files that are dependent on later stages
-* `kt` can lean on the underlying build system to provide parallelism for extra speed with little to no effort
+This repo provides a docker image as a tool to use `gomplate` with `kubectl` to deploy Kubernetes apps across different environments with templating.
 
 ## Usage
 
@@ -29,21 +23,12 @@ You can now run the tool as required with `docker-compose run --rm kt <command>`
 * *deploy*: Will compile and deploy the manifests files for an environment (given via the `-e ENV` flag).
 * *delete*: **CAUTION**, will compile and join the manifests and then delete all the Objects on the API server that are named in the compiled manifests.
 
-The above are the two main commands, but because `kt` uses a dependency build tool you can debug intermin stages of the build such:
-
-* *compile*: Will compile each template file with the given env - you can then view them in the `_build/<env>/compiled/templates` folder.
-* *join*: Will compile and then merge all the template files together into a single file of Kubernetes manifests. This can be viewed at `_build/<env>/joined.yaml`.
-
 ### Command line flags
 
-`kt` uses the Haskell library [Shake](http://shakebuild.com/) so you can use any of the available command line flags to increase/decrease logging, debug issues, determine timings and do dry runs. To see all available options, run `docker-compose run --rm kt -h`.
+`kt` has two flags to use when running the commands above:
 
-By default `kt` uses 4 threads to parallalize as much of the work as possible, to change the amount of threads use the `-j` flag, eg to use a single thread to make debugging easier set `-j1`.
-
-In addition to all the Shake flags, the following two flags can be used that are specific to `kt`:
-
-* -e ENVIRONMENT, --kt-environment=ENVIRONMENT  The Kubernetes environment to deploy to (name of file in 'env' folder sans .yaml).
-* -c COMPONENT, --kt-component=COMPONENT  The component (a subfolder under your templates dir) you want to deploy.
+* -e ENVIRONMENT  The Kubernetes environment to deploy to (name of file in 'env' folder sans .yaml).
+* -c COMPONENT  The component (a subfolder under your templates dir) you want to deploy.
 
 ## Conventions
 
@@ -69,11 +54,10 @@ The template files are joined in alphabetical order. This means that one can con
 
 `kt` is simply a combination of the following tools with folder conventions:
 
-* [shake](http://shakebuild.com/) to provide a programmatic dependency build tool specific to our conventions and domain. This is a library in Haskell so gives full programming language power, with strong type safety.
 * [gomplate](https://gomplate.hairyhenderson.ca/) to provide templating of Kubernetes manifests to allow for different environments and complex setup
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) to due the actual deployment of the compiled template manifests.
 
-By using pre made tools such as gomplate and Shake we get alot of useful extras already built in, such as extra functions for templating and a great dependency build tool that supports parallelisation and command line flags with zero effort or maintenance.
+By using pre made tools such as gomplate we get alot of useful extras already built in, such as extra functions for templating and a great dependency build tool that supports parallelisation and command line flags with zero effort or maintenance.
 
 This is sticking with the principle of not reinventing the wheel and rewriting a specific tool from scratch that would require more effort, testing and maintenance. Were `kt` to be useful and we found that we were fighting the above tools, or having to bend over backwards too much to have it work with them, this is when we would consider writing a tool from scratch.
 
