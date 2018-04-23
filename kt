@@ -44,6 +44,7 @@ sub_help() {
     echo "    clean     Clean the compile folder (under _build)"
     echo "    compile   Use gomplate to compile the templates"
     echo "    validate  Validate the compiled templates against a Kubernetes API server"
+    echo "    join      DEPRECATED: this is the same as compile now"
     echo "    deploy    Apply the compiled templates to a Kubernetes API server"
     echo "    delete    Delete the items in the compiled templates on a Kubernetes API server"
     echo ""
@@ -61,6 +62,10 @@ sub_compile() {
 
   mkdir -p _build/$env/$componentBuildPath/templates
   gomplate --output-dir _build/$env/$componentBuildPath/templates --input-dir templates/$componentTemplatePath --datasource config=envs/$env.yaml
+}
+
+sub_join() {
+  sub_compile $@
 }
 
 sub_validate() {
