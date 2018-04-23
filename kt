@@ -64,19 +64,19 @@ sub_compile() {
 }
 
 sub_validate() {
-  sub_compile
+  sub_compile $@
   echo "Validating for $env..."
   kubectl apply -R --validate --dry-run -f _build/$env/$componentBuildPath/templates/
 }
 
 sub_deploy() {
-  sub_compile
+  sub_compile $@
   echo "Deploying for $env..."
   kubectl apply -R -f _build/$env/$componentBuildPath/templates/
 }
 
 sub_delete() {
-  sub_compile
+  sub_compile $@
   echo "Deleting items for $env with components $componentBuildPath..."
   kubectl delete -R -f _build/$env/$componentBuildPath/templates/
 }
